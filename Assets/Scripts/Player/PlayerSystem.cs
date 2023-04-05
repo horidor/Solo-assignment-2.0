@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using InputReader;
 
 namespace Player
 {
-    public class PlayerSystem
+    public class PlayerSystem : IDisposable
     {
         private readonly PlayerEntity _playerEntity;
         private readonly PlayerBrain _playerBrain;
@@ -12,6 +13,11 @@ namespace Player
         {
             _playerEntity = playerEntity;
             _playerBrain = new PlayerBrain(_playerEntity, inputSources);
+        }
+
+        public void Dispose()
+        {
+            _playerBrain.Dispose();
         }
     }
 }
