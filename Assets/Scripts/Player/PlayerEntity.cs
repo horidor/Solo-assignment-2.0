@@ -72,7 +72,7 @@ namespace Player
             _animator.PlayAnimation(AnimationType.Jump, !IsGrounded());
         }
 
-        public void startAttack()
+        public void StartAttack()
         {
             if (!_animator.PlayAnimation(AnimationType.Attack, true))
                 return;
@@ -81,7 +81,6 @@ namespace Player
             _animator.AnimationEnded += AttackEnd;
             
         }
-
         private void Attack()
         {
             Debug.Log("Attack");
