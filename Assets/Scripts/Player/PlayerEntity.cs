@@ -1,77 +1,49 @@
 using System.Collections;
 using System.Collections.Generic;
-using Player.PlayerAnimation;
+using Core.Animation;
+using Core.Movement.Controller;
 using UnityEngine;
+using Core.Movement.Data;
+using Core.Services.Updater;
+using UnityEditor;
 
 namespace Player
 {
     public class PlayerEntity : MonoBehaviour
     {
         [SerializeField] private AnimationController _animator;
-        [SerializeField] private float _horizontalSpeed;
-        [SerializeField] private float _jumpForce;
-        [SerializeField] private float _gravityScale;
-        [SerializeField] private bool _faceRight;
-        [SerializeField] private LayerMask _jumpableGround;
-
-        private Rigidbody2D _rigidbody;
-        private BoxCollider2D _boxcollider;
-        private Vector2 _movement;
-        private AnimationType _currentAnimationType;
         
+        [SerializeField] private DirectionalMovementData _directionalMovementData;
+        [SerializeField] private JumperData _jumpData;
+
+        private Jumper _jumper;
+        private DirectionalMover _directionalMover;
+       
+        private BoxCollider2D _boxCollider;
+        private Rigidbody2D _rigidbody;
+
         private void Start()
         {
-            _movement.y = 0;
             _rigidbody = GetComponent<Rigidbody2D>();
-            _boxcollider = GetComponent<BoxCollider2D>();
-            _rigidbody.gravityScale = _gravityScale;
+            _directionalMover = new DirectionalMover(_rigidbody, transform, _directionalMovementData);
+            _boxCollider = GetComponent<BoxCollider2D>();
+            _jumper = new Jumper(_rigidbody, _boxCollider, _jumpData);
         }
 
-        public void MoveHorizontally(float direction)
-        {
-            _movement.x = direction;
-            SetDirection(direction);
-            Vector2 velocity = _rigidbody.velocity;
-            velocity.x = direction * _horizontalSpeed;
-            _rigidbody.velocity = velocity;
-        }
-
-        private void SetDirection(float direction)
-        {
-            if ((_faceRight && direction < 0) || (!_faceRight && direction > 0))
-                Flip();
-        }
-
-        public void Jump()
-        {
-            if (IsGrounded())
-                _rigidbody.AddForce(Vector2.up * _jumpForce);
-        }
-        
-        public void Flip()
-        {
-            transform.Rotate(0, 180, 0);
-            _faceRight = !_faceRight;
-        }
+        public void MoveHorizontally(float direction) => _directionalMover.MoveHorizontally(direction);
+        public void Jump() => _jumper.Jump();
 
         private void Update()
         {
             UpdateAnimations();
         }
 
-        private bool IsGrounded()
-        {
-            return Physics2D.BoxCast(_boxcollider.bounds.center, _boxcollider.bounds.size, 0f,
-                Vector2.down, 0.01f, _jumpableGround);
-        }
-
         private void UpdateAnimations()
         {
             _animator.PlayAnimation(AnimationType.Idle, true);
-            _animator.PlayAnimation(AnimationType.Run, _movement.magnitude > 0);
-            _animator.PlayAnimation(AnimationType.Jump, !IsGrounded());
+            _animator.PlayAnimation(AnimationType.Run, _directionalMover.IsMoving);
+            _animator.PlayAnimation(AnimationType.Jump, !_jumper.IsGrounded());
         }
-
         public void StartAttack()
         {
             if (!_animator.PlayAnimation(AnimationType.Attack, true))

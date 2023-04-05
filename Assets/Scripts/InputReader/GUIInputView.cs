@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-public class GUIInputView: MonoBehaviour, IEntityInputSource
+namespace InputReader {
+    public class GUIInputView: MonoBehaviour, IEntityInputSource
     {
         [SerializeField] private Joystick _joystick;
         [SerializeField] private Button _jumpButton;
@@ -29,5 +30,5 @@ public class GUIInputView: MonoBehaviour, IEntityInputSource
             Attack = false;
         }
     }
-
+}
 
