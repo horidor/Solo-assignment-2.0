@@ -8,3 +8,13 @@ Temp/
 Assembly-CSharp.csproj
 
 Solo assignment 2.0.sln
+
+Assembly-CSharp-Editor-firstpass.csproj
+
+Assembly-CSharp-Editor.csproj
+
+Assembly-CSharp-firstpass.csproj
+
+user.keystore
+
+obj/
